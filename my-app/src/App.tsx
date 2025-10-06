@@ -85,7 +85,7 @@ function App() {
     try {
       console.log('Submitting form data:', formData);
       
-      const response = await fetch('/api/lead/add', {
+      const response = await fetch('https://izigiz.com/api/lead/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
