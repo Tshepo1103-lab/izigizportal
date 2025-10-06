@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import dayjs from 'dayjs'
 import axios from 'axios'
+
+// Configure axios defaults
+axios.defaults.timeout = 10000;
+axios.defaults.withCredentials = false;
 import { 
   Layout, 
   Button, 
@@ -86,10 +90,9 @@ function App() {
     try {
       console.log('Submitting form data:', formData);
       
-      const response = await axios.post('https://izigiz.com/api/lead/add', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await axios.post('/api/lead/add', formData, {
+        withCredentials: false,
+        timeout: 10000,
       });
 
       console.log('Response status:', response.status);
