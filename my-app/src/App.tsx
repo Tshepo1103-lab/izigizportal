@@ -79,7 +79,7 @@ function App() {
     }));
   };
 
-  const handleSubmit = async (values?: any) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
     try {
