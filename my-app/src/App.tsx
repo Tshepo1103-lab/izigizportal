@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import dayjs from 'dayjs'
+import axios from 'axios'
 import { 
   Layout, 
   Button, 
@@ -85,50 +86,46 @@ function App() {
     try {
       console.log('Submitting form data:', formData);
       
-      const response = await fetch('https://izigiz.com/api/lead/add', {
-        method: 'POST',
+      const response = await axios.post('https://izigiz.com/api/lead/add', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
-        mode: 'cors', // Explicitly set CORS mode
       });
 
       console.log('Response status:', response.status);
       console.log('Response headers:', response.headers);
 
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Success response:', responseData);
-        message.success('Thank you! We will call you back soon.');
-        setIsFormOpen(false);
-        // Reset form
-        setFormData({
-          FirstName: '',
-          LastName: '',
-          CellNumber: '',
-          Email: '',
-          Parameters: [
-            { Key: 'LeadCampaignCode', Value: 'KRLKP0001' },
-            { Key: 'DateOfBirth', Value: '' },
-            { Key: 'CarMake', Value: '' },
-            { Key: 'CarModel', Value: '' },
-            { Key: 'CarYear', Value: '' },
-            { Key: 'CarUsage', Value: 'Private' },
-            { Key: 'PreferedTimeOfCall', Value: '' }
-          ]
-        });
-      } else {
-        const errorText = await response.text();
-        console.error('Server error response:', errorText);
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
+      console.log('Success response:', response.data);
+      message.success('Thank you! We will call you back soon.');
+      setIsFormOpen(false);
+      // Reset form
+      setFormData({
+        FirstName: '',
+        LastName: '',
+        CellNumber: '',
+        Email: '',
+        Parameters: [
+          { Key: 'LeadCampaignCode', Value: 'KRLKP0001' },
+          { Key: 'DateOfBirth', Value: '' },
+          { Key: 'CarMake', Value: '' },
+          { Key: 'CarModel', Value: '' },
+          { Key: 'CarYear', Value: '' },
+          { Key: 'CarUsage', Value: 'Private' },
+          { Key: 'PreferedTimeOfCall', Value: '' }
+        ]
+      });
     } catch (error) {
       console.error('Error submitting form:', error);
       
       // More specific error messages
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        message.error('Network error: Unable to connect to the server. This might be a CORS issue or the server is down.');
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+          message.error('Network error: Unable to connect to the server. This might be a CORS issue or the server is down.');
+        } else if (error.response) {
+          message.error(`Server error: ${error.response.status} - ${error.response.data?.message || error.response.statusText}`);
+        } else {
+          message.error(`Error: ${error.message}`);
+        }
       } else if (error instanceof Error) {
         message.error(`Error: ${error.message}`);
       } else {
